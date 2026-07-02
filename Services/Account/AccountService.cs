@@ -107,14 +107,60 @@ namespace IdentityEFCoreWebAPI.Services.Account
 
         }
 
-        public Task<ProfileDTO> GetUserProfileByEmailAsync(string email)
+        public async Task<ProfileDTO> GetUserProfileByEmailAsync(string email)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException("Email cannot be null or empty.", nameof(email));
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if(user == null)
+            {
+                throw new ArgumentException("User not found", nameof(email));
+            }
+
+            return new ProfileDTO
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName ?? string.Empty,
+                Username = user.Email ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                PhoneNumber = user.PhoneNumber,
+                LastLoggedIn = user.LastLogin,
+                CreatedOn = user.CreatedOn,
+                DateOfBirth = user.DateOfBirth
+            };
+
         }
 
-        public Task<SignInResult> LoginUserAsync(LoginDTO loginmodel)
+        public async Task<SignInResult> LoginUserAsync(LoginDTO loginModel)
         {
-            throw new NotImplementedException();
+            if (loginModel == null && string.IsNullOrWhiteSpace(loginModel.Email))
+            {
+                throw new ArgumentException("Login argumentes or email should not be empty");
+            }
+
+
+            var resultUser = await _userManager.FindByEmailAsync(loginModel.Email);
+            if (resultUser == null) {
+                return SignInResult.Failed;
+            }
+
+            if(!await _userManager.IsEmailConfirmedAsync(resultUser)) {
+                return SignInResult.NotAllowed;
+            }
+
+            var signInResult = await _signInManager.PasswordSignInAsync(resultUser.UserName!, loginModel.Password, loginModel.RememberMe, lockoutOnFailure: false);
+
+            if (signInResult.Succeeded)
+            {
+                resultUser.LastLogin = DateTime.UtcNow;
+                await _userManager.UpdateAsync(resultUser);
+
+            }
+
+            return signInResult;
         }
 
         public async Task LogoutUserAsync()
@@ -124,9 +170,34 @@ namespace IdentityEFCoreWebAPI.Services.Account
 
       
 
-        public Task SendEmailConfirmationAsync(string email)
+        public async Task SendEmailConfirmationAsync(string email)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException(" Email is required", nameof(email));
+            }
+
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if(user == null)
+            {
+                return;
+            }
+            
+            if(!await _userManager.IsEmailConfirmedAsync(user))
+            {
+                return;
+            }
+
+
+            var token = await GenerateEmailConfirmationTokenAsync(user);
+
+            var baseURL = _configuration["BaseUrl"] ?? throw new InvalidOperationException("Base URl is not configuard");
+
+            var confirmationEmailLink = $"{baseURL}/Account/ConfirmEmail?userId={user.Id}&token={token}";
+            await _emailService.SendResendConfirmationEmailAsync(user.Email!, user.FirstName!, confirmationEmailLink);
+
         }
 
 
