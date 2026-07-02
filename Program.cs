@@ -26,7 +26,9 @@ namespace IdentityEFCoreWebAPI
 
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-           
+                //.AddDefaultTokenProviders();
+
+
 
             var app = builder.Build();
 
