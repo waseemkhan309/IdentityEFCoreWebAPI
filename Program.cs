@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using IdentityEFCoreWebAPI.DbContext;
 using Microsoft.EntityFrameworkCore;
 using IdentityEFCoreWebAPI.Models;
+using IdentityEFCoreWebAPI.Services.Account;
+using IdentityEFCoreWebAPI.Services.EmailService;
 
 //using Scalar.AspNetCore;
 
@@ -25,10 +27,12 @@ namespace IdentityEFCoreWebAPI
             });
 
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-                //.AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
 
+            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
 
             var app = builder.Build();
 

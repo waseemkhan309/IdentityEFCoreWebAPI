@@ -1,9 +1,9 @@
 ﻿
 
-using System.ComponentModel;
+
 using System.ComponentModel.DataAnnotations;
 
-namespace IdentityEFCoreWebAPI.Data
+namespace IdentityEFCoreWebAPI.DTOs
 {
     public class RegisterDTO
     {
@@ -42,16 +42,5 @@ namespace IdentityEFCoreWebAPI.Data
         [Compare("Password", ErrorMessage ="Password and confirmation password do not match.")]
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; } = null!;
-
-
-
-
-
-
-
-
-
-
-
     }
 }

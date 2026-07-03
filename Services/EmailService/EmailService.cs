@@ -7,12 +7,12 @@ namespace IdentityEFCoreWebAPI.Services.EmailService
     public class EmailService : IEmailService
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger _logger;
+        
 
-        public EmailService(IConfiguration configuration, ILogger logger)
+        public EmailService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _logger = logger;
+           
         }
 
         public async Task SendRegistrationEmailAsync(string toEmail, string firstName, string confirmationLink) {
@@ -95,13 +95,7 @@ namespace IdentityEFCoreWebAPI.Services.EmailService
                             Text = body
                         };
                     }
-                    else
-                    {
-                        message.Body = new TextPart("plain")
-                        {
-                            Text = body
-                        };
-                    }
+                  
 
                     using (var client = new SmtpClient())
                     {
@@ -113,14 +107,14 @@ namespace IdentityEFCoreWebAPI.Services.EmailService
                         await client.SendAsync(message);
 
                     }
-                        _logger.LogInformation($"Email sent to {toEmail} with subject: {subject}");
+                        //_logger.LogInformation($"Email sent to {toEmail} with subject: {subject}");
                 }
 
             }catch(Exception ex)
             {
-                //Console.WriteLine($@" Exception Error in Send Email Async Method -- {ex.ToString()}");
+                Console.WriteLine($@" Exception Error in Send Email Async Method -- {ex.ToString()}");
                 //Console.WriteLine(ex.StackTrace);
-                _logger.LogError(ex, $"Failed to send email to {toEmail} with subject: {subject}");
+                //_logger.LogError(ex, $"Failed to send email to {toEmail} with subject: {subject}");
                 throw;
             }
     }

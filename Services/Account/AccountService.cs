@@ -1,4 +1,4 @@
-﻿using IdentityEFCoreWebAPI.Data;
+﻿
 using IdentityEFCoreWebAPI.DTOs;
 using IdentityEFCoreWebAPI.Models;
 using IdentityEFCoreWebAPI.Services.EmailService;
@@ -14,19 +14,19 @@ namespace IdentityEFCoreWebAPI.Services.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
-        private readonly ILogger _logger;
+
 
         public AccountService(UserManager<ApplicationUser> userManager,
                               SignInManager<ApplicationUser> signInManager,
                               IEmailService emailService,
-                              IConfiguration configuration,
-                              ILogger logger
+                              IConfiguration configuration
+                              
         ){
             _userManager = userManager;
             _signInManager = signInManager;
             _emailService = emailService;
             _configuration = configuration;
-            _logger = logger;
+           
         }
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterDTO registerDto)
@@ -60,10 +60,10 @@ namespace IdentityEFCoreWebAPI.Services.Account
 
             var token = await GenerateEmailConfirmationTokenAsync(user);
 
-            var baseUrl = _configuration["AppSettings:BaseUrl"] ?? throw new InvalidOperationException("BaseUrl is not configured.");
-            var confirmationLink = $"{baseUrl}/Account/ConfirmEmail?userId={user.Id}&token={token}";
+            //var baseUrl = _configuration["BaseUrl"] ?? throw new InvalidOperationException("BaseUrl is not configured.");
+            //var confirmationLink = $"{baseUrl}/Account/ConfirmEmail?userId={user.Id}&token={token}";
 
-            await _emailService.SendRegistrationEmailAsync(user.Email, user.FirstName, confirmationLink);
+            //await _emailService.SendRegistrationEmailAsync(user.Email, user.FirstName, confirmationLink);
 
             return result;
 
